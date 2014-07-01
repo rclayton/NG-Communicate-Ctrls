@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PubSub Communication</title>
+    <script src="../lib/angular.min.js" type="text/javascript"></script>
+    <style>
+        div {
+            background-color: rgba(120,120,120,0.2);
+            padding: 10px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var app = angular.module("app", []);
+
+        app.controller("PingCtrl", [ '$scope', '$rootScope', function($scope, $rootScope){
+
+            $scope.time = "(never)";
+
+            $rootScope.$on("pong", function(e, time){
+
+                $scope.time = time;
+            });
+
+            $scope.ping = function(){
+
+                $rootScope.$broadcast("ping", new Date());
+            };
+
+        }]);
+
+        app.controller("PongCtrl", [ '$scope', function($scope){
+
+            $scope.time = "(never)";
+
+            $scope.$on("ping", function(e, time){
+
+                $scope.time = time;
+            });
+
+            $scope.pong = function(){
+
+                $scope.$emit("pong", new Date());
+            };
+
+        }]);
+
+    </script>
+</head>
+<body ng-app="app">
+<div ng-controller="PingCtrl">
+
+    <h3>Ping Controller</h3>
+
+    <p>Received last pong at {{ time }}.</p>
+
+    <button type="button" ng-click="ping()">Ping!</button>
+
+</div>
+<br />
+<div ng-controller="PongCtrl">
+
+    <h3>Pong Controller</h3>
+
+    <p>Received last ping at {{ time }}.</p>
+
+    <button type="button" ng-click="pong()">Pong!</button>
+
+</div>
+</body>
+</html>
