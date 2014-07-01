@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parent-Child Communication</title>
+    <script src="../lib/angular.min.js" type="text/javascript"></script>
+    <style>
+        div {
+            background-color: rgba(120,120,120,0.2);
+            padding: 10px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var app = angular.module("app", []);
+
+        app.controller("ParentCtrl", [ '$scope', function($scope){
+
+            $scope.title = "I'm the Parent.";
+        }]);
+
+        app.controller("ChildCtrl", [ '$scope', function($scope){
+
+            $scope.title = "I'm the Child.";
+        }]);
+
+    </script>
+</head>
+<body ng-app="app">
+    <div ng-controller="ParentCtrl">
+
+        <h1>{{ title }}</h1>
+
+        <p>{{ description }}</p>
+
+        <div ng-controller="ChildCtrl">
+
+            <h1>{{ title }}</h1>
+
+            <input type="text" ng-model="$parent.description" />
+
+        </div>
+    </div>
+</body>
+</html>
