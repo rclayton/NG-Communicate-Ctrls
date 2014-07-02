@@ -1,0 +1,6 @@
+<h1>Pick a City in {{state}}</h1>
+<ul>
+    <li ng-repeat="city in cities">
+        <a ui-sref="conclusion({ city: city, state: state })">{{ city }}</a>
+    </li>
+</ul>

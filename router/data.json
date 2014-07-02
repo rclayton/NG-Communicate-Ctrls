@@ -1,0 +1,24 @@
+{
+    "California": [
+        "Los Angeles",
+        "San Diego",
+        "San Francisco",
+        "Oakland",
+        "Fresno",
+        "Sacramento"
+    ],
+    "Arizona": [
+        "Phoenix",
+        "Flagstaff",
+        "Tucson"
+    ],
+    "Nevada": [
+        "Las Vegas",
+        "Reno",
+        "Carson City"
+    ],
+    "Oregon": [
+        "Portland",
+        "Bend"
+    ]
+}

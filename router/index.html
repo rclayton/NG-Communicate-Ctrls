@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Passing State Using Routes</title>
+    <script src="../lib/angular.min.js" type="text/javascript"></script>
+    <script src="../lib/angular-ui-router.min.js" type="text/javascript"></script>
+    <style>
+        div {
+            background-color: rgba(120,120,120,0.2);
+            padding: 10px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var app = angular.module("app", ["ui.router"]);
+
+        app.controller("StateCtrl", [ '$scope', 'states',
+            function($scope, states){
+
+                $scope.states = states;
+        }]);
+
+        app.controller("CityCtrl", [ '$scope', 'state', 'cities',
+            function($scope, state, cities){
+
+                $scope.state = state;
+                $scope.cities = cities;
+        }]);
+
+        app.controller("ConclusionCtrl", [ '$scope', 'location',
+            function($scope, location){
+
+                $scope.location = location;
+        }]);
+
+        app.config(
+            ["$stateProvider", "$urlRouterProvider",
+            function($stateProvider, $urlRouterProvider){
+
+                $urlRouterProvider.otherwise("/state");
+
+                $stateProvider.state("state", {
+                    templateUrl: "state.template.html",
+                    controller: "StateCtrl",
+                    url: "/state",
+                    resolve: {
+                        states: function($http){
+                            return $http.get("data.json").then(function(res){
+                                var states = [];
+                                for (var k in res.data){
+                                    states.push(k);
+                                }
+                                return states;
+                            });
+                        }
+                    }
+                });
+
+                $stateProvider.state("city", {
+                    templateUrl: "city.template.html",
+                    controller: "CityCtrl",
+                    url: "/state/:state",
+                    resolve: {
+                        state: function($stateParams){
+                            return $stateParams.state;
+                        },
+                        cities: function($http, state){
+                            return $http.get("data.json").then(function(res){
+                                return res.data[state];
+                            })
+                        }
+                    }
+                });
+
+                $stateProvider.state("conclusion", {
+                    templateUrl: "conclusion.template.html",
+                    controller: "ConclusionCtrl",
+                    url: "/conclude/:state/:city",
+                    resolve: {
+                        location: function($stateParams){
+                            return {
+                                city: $stateParams.city,
+                                state: $stateParams.state
+                            }
+                        }
+                    }
+                });
+
+            }]);
+
+    </script>
+</head>
+<body ng-app="app">
+    <div ui-view></div>
+</body>
+</html>
