@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Service Communication</title>
+    <script src="../lib/angular.min.js" type="text/javascript"></script>
+    <style>
+        div {
+            background-color: rgba(120,120,120,0.2);
+            padding: 10px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var app = angular.module("app", []);
+
+        app.service("NotifyingCache", ["$rootScope", function($rootScope){
+
+            var cache = {};
+
+            this.put = function(key, value){
+                var oldValue = this.get(key);
+                cache[key] = value;
+                $rootScope.$broadcast(
+                    "cache.item.updated",
+                    { key: key, newValue: value, oldValue: oldValue });
+            };
+
+            this.remove = function(key){
+                var value = this.get(key);
+                delete cache[key];
+                $rootScope.$broadcast(
+                    "cache.item.removed", { key: key, value: value });
+            }
+
+            this.get = function(key){
+                return cache[key] || null;
+            }
+        }]);
+
+        app.controller("Ctrl1",
+            ["$scope", "NotifyingCache",
+                function($scope, NotifyingCache){
+
+                NotifyingCache.put("asdf", "123");
+
+                $scope.add = function(){
+                    NotifyingCache.put($scope.key, $scope.value);
+                };
+        }]);
+
+        app.controller("Ctrl2",
+            ["$scope", "NotifyingCache",
+                function($scope, NotifyingCache){
+
+                $scope.get = function(){
+                    console.log($scope.key);
+                    $scope.value = NotifyingCache.get($scope.key);
+                    console.log($scope.value);
+                };
+
+                $scope.remove = function(){
+                    $scope.value = "";
+                    NotifyingCache.remove($scope.key);
+                }
+        }]);
+
+        app.controller("SummaryCtrl",
+            ["$scope", "NotifyingCache",
+                function($scope, NotifyingCache){
+
+                    $scope.variables = {};
+
+                    $scope.$on("cache.item.updated", function(e, kvp){
+                        $scope.variables[kvp.key] = kvp.newValue;
+                    });
+
+                    $scope.$on("cache.item.removed", function(e, kvp){
+                        delete $scope.variables[kvp.key];
+                    });
+        }]);
+
+    </script>
+</head>
+<body ng-app="app">
+    <div ng-controller="Ctrl1">
+        <h3>Controller 1</h3>
+        <input type="text" ng-model="key" placeholder="Key Name" />
+        <input type="text" ng-model="value" placeholder="Value" />
+        <button type="button" ng-click="add()">Add to Cache</button>
+    </div>
+    <br />
+    <div ng-controller="Ctrl2">
+        <h3>Controller 2</h3>
+        <p>Key '{{key}}' has a value of '{{value}}'.</p>
+        <input type="text" ng-model="key" placeholder="Key Name" />
+        <button type="button" ng-click="get()">Get From Cache</button>
+        <button type="button" ng-click="remove()">Remove From Cache</button>
+    </div>
+    <br />
+    <div ng-controller="SummaryCtrl">
+        <h3>Cache State:</h3>
+        <ul>
+            <li ng-repeat="(k, v) in variables">
+                <strong>{{k}}:</strong>
+                <span style="margin-left: 10px">{{v}}</span>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
