@@ -17,6 +17,10 @@
 
             var cache = {};
 
+            setInterval(function(){
+                cache = {};
+            }, 10 * 1000);
+
             this.put = function(key, value){
                 var oldValue = this.get(key);
                 cache[key] = value;
@@ -41,8 +45,6 @@
             ["$scope", "NotifyingCache",
                 function($scope, NotifyingCache){
 
-                NotifyingCache.put("asdf", "123");
-
                 $scope.add = function(){
                     NotifyingCache.put($scope.key, $scope.value);
                 };
@@ -53,15 +55,20 @@
                 function($scope, NotifyingCache){
 
                 $scope.get = function(){
-                    console.log($scope.key);
                     $scope.value = NotifyingCache.get($scope.key);
-                    console.log($scope.value);
                 };
 
                 $scope.remove = function(){
                     $scope.value = "";
                     NotifyingCache.remove($scope.key);
                 }
+        }]);
+
+        app.controller("Ctrl3",
+            ["$scope", "NotifyingCache",
+                function($scope, NotifyingCache){
+
+                $scope.cache = NotifyingCache;
         }]);
 
         app.controller("SummaryCtrl",
@@ -95,6 +102,11 @@
         <input type="text" ng-model="key" placeholder="Key Name" />
         <button type="button" ng-click="get()">Get From Cache</button>
         <button type="button" ng-click="remove()">Remove From Cache</button>
+    </div>
+    <br />
+    <div ng-controller="Ctrl3">
+        <h3>Controller 3</h3>
+        <p>Bad example of using watches (on variable 'num_unicorns'): {{ cache.get('num_unicorns') }}.</p>
     </div>
     <br />
     <div ng-controller="SummaryCtrl">
